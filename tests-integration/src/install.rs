@@ -90,7 +90,7 @@ pub(crate) fn run_alongside(image: &str, mut testargs: libtest_mimic::Arguments)
             tmpdisk.as_file_mut().set_len(size)?;
             let tmpdisk = tmpdisk.into_temp_path();
             let tmpdisk = tmpdisk.to_str().unwrap();
-            cmd!(sh, "sudo {BASE_ARGS...} -v {tmpdisk}:/disk {image} bootc install to-disk --via-loopback {generic_inst_args...} /disk").run()?;
+            cmd!(sh, "sudo {BASE_ARGS...} -v {tmpdisk}:/disk {image} bootc install to-disk --filesystem xfs --via-loopback {generic_inst_args...} /disk").run()?;
             Ok(())
         }),
         Trial::test(
