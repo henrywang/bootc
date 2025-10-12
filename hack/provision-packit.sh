@@ -70,18 +70,6 @@ REPOEOF
     cp "${BOOTC_TEMPDIR}/rhel.repo" /etc/yum.repos.d
 fi
 
-# Fedora CI: https://github.com/fedora-ci/dist-git-pipeline/blob/master/Jenkinsfile#L145
-# OSCI: https://gitlab.cee.redhat.com/osci-pipelines/dist-git-pipeline/-/blob/master/Jenkinsfile?ref_type=heads#L93
-if [[ -v KOJI_TASK_ID ]] || [[ -v CI_KOJI_TASK_ID ]]; then
-    # Just left those ls commands here to ring the bell for me when something changed
-    echo "$TMT_SOURCE_DIR"
-    ls -al "$TMT_SOURCE_DIR"
-    ls -al "$TMT_SOURCE_DIR/SRPMS"
-    GATING="true"
-else
-    GATING="false"
-fi
-
 ls -al /etc/yum.repos.d
 cat /etc/yum.repos.d/test-artifacts.repo
 ls -al /var/share/test-artifacts
@@ -93,7 +81,7 @@ cp /etc/yum.repos.d/test-artifacts.repo "$BOOTC_TEMPDIR"
 ls -al "$BOOTC_TEMPDIR" "${BOOTC_TEMPDIR}/bin"
 
 # Do not use just because it's only available on Fedora, not on CS and RHEL
-podman build --jobs=4 --from "$BASE" --build-arg GATING="$GATING" -v "$BOOTC_TEMPDIR":/bootc-test:z -t localhost/bootc-integration -f "${BOOTC_TEMPDIR}/Containerfile.packit" "$BOOTC_TEMPDIR"
+podman build --jobs=4 --from "$BASE" -v "$BOOTC_TEMPDIR":/bootc-test:z -t localhost/bootc-integration -f "${BOOTC_TEMPDIR}/Containerfile.packit" "$BOOTC_TEMPDIR"
 
 # Keep these in sync with what's used in hack/lbi
 podman pull -q --retry 5 --retry-delay 5s quay.io/curl/curl:latest quay.io/curl/curl-base:latest registry.access.redhat.com/ubi9/podman:latest

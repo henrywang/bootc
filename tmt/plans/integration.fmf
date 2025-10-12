@@ -5,7 +5,9 @@ prepare:
   # Install image mode system on package mode system
   # Do not run on image mode VM running on Github CI and Locally
   # Run on package mode VM running on Packit and Gating
+  # order 9x means run it at the last job of prepare
   - how: install
+    order: 97
     package:
       - podman
       - skopeo
@@ -17,6 +19,7 @@ prepare:
       - zstd
     when: running_env != image_mode
   - how: shell
+    order: 98
     script:
       - mkdir -p bootc && cp /var/share/test-artifacts/*.src.rpm bootc
       - cd bootc && rpm2cpio *.src.rpm | cpio -idmv && rm -f *-vendor.tar.zstd && zstd -d *.tar.zstd && tar -xvf *.tar -C . --strip-components=1 && ls -al
@@ -25,6 +28,7 @@ prepare:
   # tmt-reboot and reboot do not work in this case
   # reboot in ansible is the only way to reboot in tmt prepare
   - how: ansible
+    order: 99
     playbook:
       - https://github.com/bootc-dev/bootc/raw/refs/heads/main/hack/packit-reboot.yml
     when: running_env != image_mode
