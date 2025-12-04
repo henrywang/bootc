@@ -33,7 +33,7 @@ use schemars::schema_for;
 use serde::{Deserialize, Serialize};
 
 use crate::bootc_composefs::delete::delete_composefs_deployment;
-use crate::bootc_composefs::soft_reboot::soft_reboot_to_deployment;
+use crate::bootc_composefs::soft_reboot::prepare_soft_reboot_composefs;
 use crate::bootc_composefs::{
     digest::{compute_composefs_digest, new_temp_composefs_repo},
     finalize::{composefs_backend_finalize, get_etc_diff},
@@ -1784,7 +1784,8 @@ async fn run_from_opt(opt: Opt) -> Result<()> {
                         anyhow::bail!("soft-reboot only implemented for composefs")
                     }
                     BootedStorageKind::Composefs(booted_cfs) => {
-                        soft_reboot_to_deployment(&storage, &booted_cfs, &deployment, reboot).await
+                        prepare_soft_reboot_composefs(&storage, &booted_cfs, &deployment, reboot)
+                            .await
                     }
                 }
             }
