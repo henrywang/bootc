@@ -10,8 +10,8 @@ use std::process::Command;
 
 use anyhow::{anyhow, ensure, Context, Result};
 use camino::{Utf8Path, Utf8PathBuf};
-use cap_std_ext::cap_std::fs::Dir;
 use cap_std_ext::cap_std;
+use cap_std_ext::cap_std::fs::Dir;
 use clap::Parser;
 use clap::ValueEnum;
 use composefs::dumpfile;
@@ -33,6 +33,7 @@ use schemars::schema_for;
 use serde::{Deserialize, Serialize};
 
 use crate::bootc_composefs::delete::delete_composefs_deployment;
+use crate::bootc_composefs::soft_reboot::soft_reboot_to_deployment;
 use crate::bootc_composefs::{
     digest::{compute_composefs_digest, new_temp_composefs_repo},
     finalize::{composefs_backend_finalize, get_etc_diff},
@@ -603,6 +604,11 @@ pub(crate) enum InternalsOpts {
     #[cfg(feature = "docgen")]
     /// Dump CLI structure as JSON for documentation generation
     DumpCliJson,
+    PrepSoftReboot {
+        deployment: String,
+        #[clap(long)]
+        reboot: bool,
+    },
 }
 
 #[derive(Debug, clap::Subcommand, PartialEq, Eq)]
@@ -1768,6 +1774,19 @@ async fn run_from_opt(opt: Opt) -> Result<()> {
                 }
 
                 Ok(())
+            }
+            InternalsOpts::PrepSoftReboot { deployment, reboot } => {
+                let storage = &get_storage().await?;
+
+                match storage.kind()? {
+                    BootedStorageKind::Ostree(..) => {
+                        // TODO: Call ostree implementation?
+                        anyhow::bail!("soft-reboot only implemented for composefs")
+                    }
+                    BootedStorageKind::Composefs(booted_cfs) => {
+                        soft_reboot_to_deployment(&storage, &booted_cfs, &deployment, reboot).await
+                    }
+                }
             }
         },
         Opt::State(opts) => match opts {
