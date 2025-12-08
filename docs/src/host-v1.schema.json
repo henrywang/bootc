@@ -65,6 +65,11 @@
             }
           ]
         },
+        "downloadOnly": {
+          "description": "Whether this deployment is in download-only mode (prevented from automatic finalization on shutdown).\nThis is set via --download-only on the CLI.",
+          "type": "boolean",
+          "default": false
+        },
         "image": {
           "description": "The image reference",
           "anyOf": [
