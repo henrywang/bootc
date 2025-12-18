@@ -1,3 +1,12 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json"
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+
+  // These files are synced from the bootc-dev/infra repository, which sends
+  // PRs to update them. Ignoring them here to avoid conflicting Renovate updates.
+  "ignorePaths": [
+    ".github/workflows/rebase.yml",
+    ".github/workflows/openssf-scorecard.yml",
+    ".github/actions/bootc-ubuntu-setup/action.yml",
+    ".github/actions/setup-rust/action.yml"
+  ]
 }
