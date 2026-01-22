@@ -166,4 +166,11 @@ execute:
     how: fmf
     test:
       - /tmt/tests/tests/test-33-bib-build
+
+/plan-34-user-agent:
+  summary: Verify bootc sends correct User-Agent header to registries
+  discover:
+    how: fmf
+    test:
+      - /tmt/tests/tests/test-34-user-agent
 # END GENERATED PLANS

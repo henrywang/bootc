@@ -96,3 +96,8 @@
   require:
   - qemu-img
   test: nu booted/test-bib-build.nu
+
+/test-34-user-agent:
+  summary: Verify bootc sends correct User-Agent header to registries
+  duration: 10m
+  test: python3 booted/test-user-agent.py
