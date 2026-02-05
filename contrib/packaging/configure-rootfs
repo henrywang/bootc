@@ -26,7 +26,8 @@ else
   fs=
   case "${VARIANT}" in
     composefs*)
-      btrfs=$(grep -qEe '^CONFIG_BTRFS_FS' /usr/lib/modules/${kver}/config && echo btrfs || true)
+      # CONFIG_BTRFS_FS=m has been added into CS10 kernel config
+      btrfs=$(grep -qEe '^CONFIG_BTRFS_FS=y' /usr/lib/modules/${kver}/config && echo btrfs || true)
       fs=${btrfs:-ext4}
       ;;
     *)
