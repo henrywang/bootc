@@ -46,6 +46,42 @@ def initial_build [] {
     if $os.ID == "rhel" {
         cp /etc/yum.repos.d/rhel.repo .
         $repo_copy = "COPY rhel.repo /etc/yum.repos.d/"
+    } else if $os.ID == "centos" {
+        let gpgkey = (
+            open /etc/yum.repos.d/centos.repo
+            | lines
+            | find --regex '^gpgkey='
+            | first
+            | split row "="
+            | last
+        )
+
+        if ($gpgkey | is-empty) {
+            print -e "Error: Could not find gpgkey in /etc/yum.repos.d/centos.repo"
+            exit 1
+        }
+
+        # Enable latest repos to avoid version skew between
+        # installed image and building image
+        let repo_content = $"[compose-baseos]
+name=CentOS Stream $releasever Compose BaseOS
+baseurl=https://composes.stream.centos.org/stream-$releasever/production/latest-CentOS-Stream/compose/BaseOS/$basearch/os/
+gpgcheck=1
+enabled=1
+priority=1
+gpgkey=($gpgkey)
+
+[compose-appstream]
+name=CentOS Stream $releasever Compose AppStream
+baseurl=https://composes.stream.centos.org/stream-$releasever/production/latest-CentOS-Stream/compose/AppStream/$basearch/os/
+gpgcheck=1
+enabled=1
+priority=1
+gpgkey=($gpgkey)
+"
+        $repo_content | save --force centos-compose.repo
+
+        $repo_copy = "COPY centos-compose.repo /etc/yum.repos.d/"
     }
 
     # Create a derived container that installs a custom SELinux policy module
