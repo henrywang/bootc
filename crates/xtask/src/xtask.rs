@@ -178,6 +178,10 @@ pub(crate) struct RunTmtArgs {
     // Required to send kargs to only bls installs
     #[arg(long, default_value_t, requires = "composefs_backend")]
     pub(crate) boot_type: BootType,
+
+    /// Additional kernel arguments to pass to bcvk
+    #[arg(long)]
+    pub(crate) karg: Vec<String>,
 }
 
 /// Arguments for tmt-provision command
